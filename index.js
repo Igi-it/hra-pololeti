@@ -68,13 +68,29 @@ const enemies = []
 
 function spawnEnemies(){
     setInterval(() => {
-        const x = 100
-        const y = 100
-        const radius = 30
+        const radius = Math.random() * (30 - 4) + 4
+
+        let x
+        let y
+
+        if (Math.random() < 0.5) {
+        x = Math.random() < 0.5 ? 0 - radius : canvas.width + radius
+        y = Math.random() * canvas.height
+    } else {
+        x = Math.random() * canvas.width
+        y = Math.random() * Math.random() < 0.5 ? 0 - radius : canvas.height + radius
+    }
+
+
         const color = 'green'
+        const angle = 
+        Math.atan2(canvas.height / 2 - y,
+         canvas.width / 2 - x)
+
         const velocity = {
-            x:1,y:1
-        }
+        x:Math.cos(angle),
+        y:Math.sin(angle)
+    }
         enemies.push(new Enemy(x,y,radius,color,velocity))
         console.log(enemies)
     },1000)
@@ -87,13 +103,27 @@ function animate(){
     projectiles.forEach(projectile =>{
     projectile.update()
 })
-enemies.forEach(enemy => {
+enemies.forEach((enemy, index) => {
     enemy.update()
+
+    projectiles.forEach((projectile, projectileIndex) => {
+       const dist = Math.hypot(projectile.x - enemy.x, projectile.y - enemy.y)
+
+       if (dist - enemy.radius  - projectile.radius < 1) 
+       {
+        setTimeout(() => {
+        enemies.splice(index, 1)
+        projectiles.splice(projectileIndex, 1)
+        }, 0)
+       }
+    })
 })
 }
 
 addEventListener('click', (event) => {
-    const angle = Math.atan2(event.clientY - canvas.height / 2, event.clientX - canvas.width / 2)
+    const angle = 
+    Math.atan2(event.clientY - canvas.height / 2,
+         event.clientX - canvas.width / 2)
     const velocity = {
         x:Math.cos(angle),
         y:Math.sin(angle)
